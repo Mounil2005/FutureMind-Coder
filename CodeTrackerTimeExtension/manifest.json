@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "CodeTrackr",
+  "version": "1.0",
+  "description": "Track time spent on coding platforms like LeetCode, Codeforces, and GitHub.",
+  "permissions": ["tabs", "storage", "alarms"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://codeforces.com/*",
+    "https://github.com/*"
+  ]
+}
