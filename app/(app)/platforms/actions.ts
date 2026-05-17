@@ -114,3 +114,28 @@ export async function syncPlatform(platform: Platform) {
   revalidatePath("/dashboard");
   revalidatePath("/activity");
 }
+
+export async function syncAllPlatforms(): Promise<{ synced: string[]; failed: string[] }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Not signed in");
+
+  const { data: accounts } = await supabase
+    .from("platform_accounts")
+    .select("platform")
+    .eq("user_id", user.id);
+
+  if (!accounts?.length) return { synced: [], failed: [] };
+
+  const results = await Promise.allSettled(
+    accounts.map((a) => syncPlatform(a.platform as Platform)),
+  );
+
+  const synced: string[] = [];
+  const failed: string[] = [];
+  for (let i = 0; i < results.length; i++) {
+    if (results[i].status === "fulfilled") synced.push(accounts[i].platform);
+    else failed.push(accounts[i].platform);
+  }
+  return { synced, failed };
+}

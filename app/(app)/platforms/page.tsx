@@ -1,4 +1,5 @@
 import { PlatformCard } from "./platform-card";
+import { SyncAllButton } from "./sync-all-button";
 import { createClient } from "@/lib/supabase/server";
 import type { Platform } from "@/lib/supabase/types";
 
@@ -32,7 +33,10 @@ export default async function PlatformsPage() {
         <p className="text-sm text-[var(--color-foreground-muted)]">
           Connect once, pull forever.
         </p>
-        <h1 className="font-display text-5xl">Platforms</h1>
+        <div className="flex items-end justify-between gap-4">
+          <h1 className="font-display text-5xl">Platforms</h1>
+          <SyncAllButton connectedCount={accounts?.length ?? 0} />
+        </div>
       </header>
 
       <p className="text-sm text-[var(--color-foreground-muted)]">

@@ -71,6 +71,12 @@
       font-family: monospace;
     }
 
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     .status-dot {
       width: 7px;
       height: 7px;
@@ -79,6 +85,22 @@
     }
 
     .status-dot.active { background: var(--success); }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      padding: 2px;
+      cursor: pointer;
+      color: var(--muted);
+      border-radius: 4px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-btn:hover { color: var(--fg); background: var(--surface2); }
+    .icon-btn.active { color: var(--primary); }
 
     .section { padding: 12px 14px; }
 
@@ -189,14 +211,74 @@
 
     .open-link:hover { color: var(--fg); }
 
+    /* ── Setup notice (no apiUrl yet) ── */
     #setup-notice {
       padding: 16px 14px;
       font-size: 12px;
       color: var(--muted);
+      line-height: 1.6;
+    }
+
+    #setup-notice strong { color: var(--fg); }
+    #setup-notice a { color: var(--primary); text-decoration: none; }
+
+    /* ── Settings panel ── */
+    #settings-panel {
+      padding: 14px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .settings-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .field label {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .field input {
+      flex: none;
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+      font-size: 12px;
+      font-family: monospace;
+      outline: none;
+    }
+
+    .field input:focus { border-color: var(--primary); }
+
+    .settings-hint {
+      font-size: 11px;
+      color: var(--muted);
       line-height: 1.5;
     }
 
-    #setup-notice a { color: var(--primary); }
+    .settings-hint a { color: var(--primary); text-decoration: none; }
+
+    #save-status {
+      font-size: 11px;
+      color: var(--success);
+      min-height: 16px;
+      text-align: center;
+    }
 
     .hidden { display: none !important; }
   </style>
@@ -207,14 +289,25 @@
       <div class="logo-icon">ct</div>
       CodeTracker
     </div>
-    <div id="status-dot" class="status-dot"></div>
+    <div class="header-right">
+      <div id="status-dot" class="status-dot"></div>
+      <!-- Gear icon -->
+      <button id="btn-settings" class="icon-btn" title="Settings" aria-label="Settings">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="8" r="2.5"/>
+          <path d="M8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3.05 3.05l1.06 1.06M11.89 11.89l1.06 1.06M3.05 12.95l1.06-1.06M11.89 4.11l1.06-1.06"/>
+        </svg>
+      </button>
+    </div>
   </div>
 
+  <!-- Shown when apiUrl is not set and settings panel is closed -->
   <div id="setup-notice" class="hidden">
-    <p>Sign in to sync your sessions.</p>
-    <p style="margin-top:6px"><a href="#" id="open-dashboard">Open dashboard →</a></p>
+    <p><strong>Almost there!</strong> Open settings (⚙) to paste your dashboard URL and auth token so the extension can sync your time.</p>
+    <p style="margin-top:8px"><a href="#" id="open-dashboard">Open dashboard →</a></p>
   </div>
 
+  <!-- Main tracker UI -->
   <div id="main" class="hidden">
     <div class="section">
       <div class="now-tracking">Now tracking</div>
@@ -240,6 +333,30 @@
         <button id="btn-reset">Reset</button>
       </div>
     </div>
+  </div>
+
+  <!-- Settings panel (toggled by gear icon) -->
+  <div id="settings-panel" class="hidden">
+    <div class="settings-title">Settings</div>
+
+    <div class="field">
+      <label for="input-api-url">Dashboard URL</label>
+      <input id="input-api-url" type="url" placeholder="https://your-app.vercel.app" autocomplete="off" spellcheck="false" />
+    </div>
+
+    <div class="field">
+      <label for="input-auth-token">Auth token</label>
+      <input id="input-auth-token" type="password" placeholder="Paste from Settings → Extension" autocomplete="off" spellcheck="false" />
+    </div>
+
+    <div class="settings-hint">
+      Find your token at <a id="settings-dash-link" href="#" target="_blank">Dashboard → Settings → Extension</a>.
+    </div>
+
+    <div class="btn-row">
+      <button id="btn-save" class="primary" style="flex:none;width:100%">Save</button>
+    </div>
+    <div id="save-status"></div>
   </div>
 
   <a id="dash-link" href="#" class="open-link" target="_blank">Open full dashboard ↗</a>

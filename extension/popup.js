@@ -33,6 +33,56 @@ async function getLocal(keys) {
   return new Promise((resolve) => chrome.storage.local.get(keys, resolve));
 }
 
+// ── Settings panel ─────────────────────────────────────────────────────────
+
+let settingsOpen = false;
+
+async function loadSettings() {
+  const { apiUrl = "", authToken = "" } = await getLocal(["apiUrl", "authToken"]);
+  document.getElementById("input-api-url").value   = apiUrl;
+  document.getElementById("input-auth-token").value = authToken ? "••••••••" : "";
+  document.getElementById("settings-dash-link").href = (apiUrl || "http://localhost:3000") + "/settings";
+}
+
+function toggleSettings() {
+  settingsOpen = !settingsOpen;
+  document.getElementById("settings-panel").classList.toggle("hidden", !settingsOpen);
+  document.getElementById("btn-settings").classList.toggle("active", settingsOpen);
+  if (settingsOpen) {
+    loadSettings();
+    document.getElementById("save-status").textContent = "";
+  }
+}
+
+document.getElementById("btn-settings").addEventListener("click", toggleSettings);
+
+document.getElementById("btn-save").addEventListener("click", async () => {
+  const apiUrl    = document.getElementById("input-api-url").value.trim().replace(/\/$/, "");
+  const rawToken  = document.getElementById("input-auth-token").value.trim();
+
+  if (!apiUrl) {
+    document.getElementById("save-status").textContent = "Dashboard URL is required.";
+    document.getElementById("save-status").style.color = "var(--primary)";
+    return;
+  }
+
+  const updates = { apiUrl };
+  // Only update token if user typed something other than our placeholder bullets
+  if (rawToken && !rawToken.startsWith("•")) updates.authToken = rawToken;
+
+  await new Promise((resolve) => chrome.storage.local.set(updates, resolve));
+
+  document.getElementById("save-status").textContent = "Saved!";
+  document.getElementById("save-status").style.color = "var(--success)";
+  setTimeout(() => {
+    document.getElementById("save-status").textContent = "";
+    toggleSettings();
+    render();
+  }, 800);
+});
+
+// ── Main render ────────────────────────────────────────────────────────────
+
 async function render() {
   const { apiUrl, totals = {}, pomodoroActive, pomodoroSecondsLeft } =
     await getLocal(["apiUrl", "totals", "pomodoroActive", "pomodoroSecondsLeft"]);
@@ -42,12 +92,12 @@ async function render() {
   );
 
   const appUrl = apiUrl || "http://localhost:3000";
-  document.getElementById("dash-link").href = appUrl + "/dashboard";
-  document.getElementById("open-dashboard").href = appUrl + "/login";
+  document.getElementById("dash-link").href       = appUrl + "/dashboard";
+  document.getElementById("open-dashboard").href  = appUrl + "/login";
 
   const hasSetup = !!apiUrl;
 
-  document.getElementById("setup-notice").classList.toggle("hidden", hasSetup);
+  document.getElementById("setup-notice").classList.toggle("hidden", hasSetup || settingsOpen);
   document.getElementById("main").classList.toggle("hidden", !hasSetup);
 
   if (!hasSetup) return;

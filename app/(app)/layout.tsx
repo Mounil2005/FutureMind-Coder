@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { Sidebar } from "@/components/shell/sidebar";
 import { Topbar } from "@/components/shell/topbar";
+import { MobileNav } from "@/components/shell/mobile-nav";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({
@@ -28,7 +29,7 @@ export default async function AppLayout({
     <div className="flex min-h-screen bg-[var(--color-background)]">
       <Sidebar displayName={displayName} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar />
+        <Topbar mobileSlot={<MobileNav displayName={displayName} />} />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>
