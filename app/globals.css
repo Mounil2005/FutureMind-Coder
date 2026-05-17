@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: var(--font-instrument-serif), "Iowan Old Style", "Apple Garamond",
+    Georgia, serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "SFMono-Regular",
+    "JetBrains Mono", monospace;
+
+  --color-background: oklch(0.972 0.012 85);
+  --color-surface: oklch(1 0 0);
+  --color-surface-2: oklch(0.955 0.010 85);
+  --color-foreground: oklch(0.205 0.014 50);
+  --color-foreground-muted: oklch(0.46 0.014 60);
+  --color-border: oklch(0.895 0.012 75);
+  --color-border-strong: oklch(0.82 0.014 70);
+  --color-input: oklch(0.93 0.010 80);
+
+  --color-primary: oklch(0.55 0.145 38);
+  --color-primary-foreground: oklch(0.985 0.005 80);
+  --color-primary-soft: oklch(0.93 0.04 38);
+
+  --color-accent: oklch(0.94 0.02 80);
+  --color-accent-foreground: oklch(0.205 0.014 50);
+
+  --color-success: oklch(0.55 0.110 155);
+  --color-warning: oklch(0.72 0.130 75);
+  --color-danger: oklch(0.58 0.180 25);
+
+  --color-chart-1: oklch(0.55 0.145 38);
+  --color-chart-2: oklch(0.55 0.110 155);
+  --color-chart-3: oklch(0.62 0.140 240);
+  --color-chart-4: oklch(0.72 0.130 75);
+  --color-chart-5: oklch(0.50 0.130 290);
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+
+  --shadow-soft: 0 1px 2px 0 oklch(0.2 0.01 50 / 0.04),
+    0 1px 3px 0 oklch(0.2 0.01 50 / 0.06);
+  --shadow-card: 0 1px 0 0 oklch(0.2 0.01 50 / 0.04),
+    0 4px 24px -8px oklch(0.2 0.01 50 / 0.06);
+}
+
+.dark {
+  --color-background: oklch(0.165 0.008 60);
+  --color-surface: oklch(0.205 0.010 60);
+  --color-surface-2: oklch(0.235 0.010 60);
+  --color-foreground: oklch(0.93 0.012 80);
+  --color-foreground-muted: oklch(0.66 0.012 70);
+  --color-border: oklch(0.285 0.012 60);
+  --color-border-strong: oklch(0.36 0.012 60);
+  --color-input: oklch(0.245 0.012 60);
+
+  --color-primary: oklch(0.70 0.140 42);
+  --color-primary-foreground: oklch(0.16 0.01 50);
+  --color-primary-soft: oklch(0.30 0.060 38);
+
+  --color-accent: oklch(0.255 0.012 60);
+  --color-accent-foreground: oklch(0.93 0.012 80);
+
+  --color-success: oklch(0.70 0.115 155);
+  --color-warning: oklch(0.78 0.120 75);
+  --color-danger: oklch(0.70 0.150 25);
+
+  --color-chart-1: oklch(0.70 0.140 42);
+  --color-chart-2: oklch(0.70 0.115 155);
+  --color-chart-3: oklch(0.72 0.140 240);
+  --color-chart-4: oklch(0.78 0.120 75);
+  --color-chart-5: oklch(0.66 0.130 290);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    color-scheme: light dark;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  ::selection {
+    background-color: oklch(from var(--color-primary) l c h / 0.2);
+    color: var(--color-foreground);
+  }
+
+  .font-display {
+    font-family: var(--font-serif);
+    font-style: italic;
+    letter-spacing: -0.02em;
+  }
+
+  .grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+@layer utilities {
+  .bg-background {
+    background-color: var(--color-background);
+  }
+  .bg-surface {
+    background-color: var(--color-surface);
+  }
+  .bg-surface-2 {
+    background-color: var(--color-surface-2);
+  }
+  .text-foreground {
+    color: var(--color-foreground);
+  }
+  .text-muted {
+    color: var(--color-foreground-muted);
+  }
+  .border-default {
+    border-color: var(--color-border);
+  }
+  .border-strong {
+    border-color: var(--color-border-strong);
+  }
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
+  .text-primary {
+    color: var(--color-primary);
+  }
+  .bg-primary-soft {
+    background-color: var(--color-primary-soft);
+  }
+  .text-success {
+    color: var(--color-success);
+  }
+  .text-warning {
+    color: var(--color-warning);
+  }
+  .text-danger {
+    color: var(--color-danger);
+  }
+}

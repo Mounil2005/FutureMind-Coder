@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "CodeTracker Timer",
+  "version": "2.0.0",
+  "description": "Tracks time on LeetCode, Codeforces, GitHub, CodeChef, and AtCoder. Syncs to your CodeTracker dashboard.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "alarms",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://leetcode.com/*",
+    "https://codeforces.com/*",
+    "https://github.com/*",
+    "https://www.codechef.com/*",
+    "https://atcoder.jp/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16":  "icons/icon16.png",
+      "48":  "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16":  "icons/icon16.png",
+    "48":  "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

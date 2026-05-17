@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CodeTracker Timer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #F8F6F1;
+      --surface:  #FFFFFF;
+      --surface2: #F0EDE6;
+      --fg:       #1B1A17;
+      --muted:    #6E6A60;
+      --border:   #E5E1D6;
+      --primary:  #B5532E;
+      --success:  #2E7D5B;
+      --radius:   10px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg:       #15161A;
+        --surface:  #1B1D22;
+        --surface2: #22242B;
+        --fg:       #E8E4DA;
+        --muted:    #8A867D;
+        --border:   #2A2C32;
+        --primary:  #D17856;
+        --success:  #5BAE85;
+      }
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 13px;
+      background: var(--bg);
+      color: var(--fg);
+      width: 280px;
+      min-height: 200px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .logo-icon {
+      width: 22px;
+      height: 22px;
+      background: var(--primary);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 9px;
+      font-weight: 700;
+      font-family: monospace;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .status-dot.active { background: var(--success); }
+
+    .section { padding: 12px 14px; }
+
+    .now-tracking {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .platform-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .platform-name.idle { color: var(--muted); font-weight: 400; font-size: 14px; }
+
+    .divider { height: 1px; background: var(--border); margin: 0 14px; }
+
+    .totals { padding: 10px 14px; }
+
+    .totals-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .platform-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+    }
+
+    .platform-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .platform-label { flex: 1; }
+    .platform-time { font-variant-numeric: tabular-nums; color: var(--muted); }
+
+    .pomodoro {
+      padding: 10px 14px 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .pomodoro-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .pomodoro-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .pomodoro-timer {
+      font-size: 22px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      padding: 4px 0 8px;
+    }
+
+    .pomodoro-timer.running { color: var(--primary); }
+
+    .btn-row { display: flex; gap: 6px; }
+
+    button {
+      flex: 1;
+      padding: 6px;
+      border-radius: 7px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: transparent;
+    }
+
+    button:hover { opacity: 0.85; }
+
+    .open-link {
+      display: block;
+      text-align: center;
+      padding: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      border-top: 1px solid var(--border);
+    }
+
+    .open-link:hover { color: var(--fg); }
+
+    #setup-notice {
+      padding: 16px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    #setup-notice a { color: var(--primary); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">ct</div>
+      CodeTracker
+    </div>
+    <div id="status-dot" class="status-dot"></div>
+  </div>
+
+  <div id="setup-notice" class="hidden">
+    <p>Sign in to sync your sessions.</p>
+    <p style="margin-top:6px"><a href="#" id="open-dashboard">Open dashboard →</a></p>
+  </div>
+
+  <div id="main" class="hidden">
+    <div class="section">
+      <div class="now-tracking">Now tracking</div>
+      <div id="platform-name" class="platform-name idle">—</div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="totals">
+      <div class="totals-title">Today's time</div>
+      <div id="totals-list"></div>
+    </div>
+
+    <div class="pomodoro">
+      <div class="pomodoro-header">
+        <div class="pomodoro-title">Pomodoro</div>
+        <span id="pomodoro-label" style="font-size:11px;color:var(--muted)">25 min</span>
+      </div>
+      <div id="pomodoro-timer" class="pomodoro-timer">25:00</div>
+      <div class="btn-row">
+        <button id="btn-start" class="primary">Start</button>
+        <button id="btn-stop" class="hidden">Stop</button>
+        <button id="btn-reset">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <a id="dash-link" href="#" class="open-link" target="_blank">Open full dashboard ↗</a>
+
+  <script src="popup.js"></script>
+</body>
+</html>
